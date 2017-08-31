@@ -100,11 +100,6 @@ class Field:
         self.check_capacity(self.enc_value, nbits, self.value)
         self._nbits = nbits
 
-    @property
-    def enc_value_repr(self):
-        """Bit representation of field value"""
-        return '0b{self.enc_value:0{self.nbits}b}'
-
 
 class SignedDecimal(Field):
     """Abstract field for Decimals"""
@@ -114,11 +109,9 @@ class SignedDecimal(Field):
 
     @classmethod
     def check_capacity(cls, enc_value, nbits, value):
-        _check_value = value
-        if _check_value < 0:
-            _check_value = abs(_check_value) - 1
-        if (_check_value > (2 ** nbits) / 2 - 1) or _check_value < 0:
+        if enc_value > 2 ** nbits - 1:
             raise OverflowError(bit_overfl_exc_txt.format(value, nbits))
+        return True
 
 
 class Bool(Field):
@@ -181,10 +174,10 @@ class Int(SignedDecimal):
         super().__init__(nbits, name, value)
 
     def encode(self):
-        self.check_capacity(None, self.nbits, self.value)
         enc_value = self.value
         if enc_value < 0:
             enc_value += 2 ** self.nbits
+        self.check_capacity(enc_value, self.nbits, self.value)
         self.enc_value = enc_value
 
     def decode(self, value):
@@ -222,10 +215,10 @@ class Float(SignedDecimal):
         super().__init__(nbits, name, value)
 
     def encode(self):
-        self.check_capacity(None, self.nbits, self.value)
         enc_value = int(round(self.value * (10 ** self.frac), 0))
         if enc_value < 0:
             enc_value += 2 ** self.nbits
+        self.check_capacity(enc_value, self.nbits, self.value)
         self.enc_value = enc_value
 
     def decode(self, value):
