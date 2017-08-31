@@ -62,6 +62,13 @@ class BitsCoder:
             self._list = [field.value for field in self._fields]
         return self._list
 
+    @property
+    def encoded(self):
+        """Encoded data"""
+        if not hasattr(self, '_encoded'):
+            self.encode()
+        return self._encoded
+
     def encode(self):
         """Encode all fields to bytearray."""
         self.validate_fields_for_encoding()
@@ -104,8 +111,8 @@ class BitsCoder:
             byte_array.append(last_byte)
         if self.byteorder == 'little':
             byte_array = byte_array[::-1]
-
-        return byte_array
+        self._encoded = byte_array
+        return self._encoded
 
     def decode(self, pld):
         """Decode values from bytearray
