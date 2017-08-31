@@ -1,7 +1,7 @@
 import unittest
 
-from fields import Int, Uint, Float, Ufloat, Bool, Unicode
 from coder import BitsCoder
+from fields import Int, Uint, Float, Ufloat, Bool, Unicode
 
 
 class TestFileds(unittest.TestCase):
@@ -99,6 +99,18 @@ class TestFileds(unittest.TestCase):
         enc = coder.encode()
         proper_value = 0b01101_00001001_1101_0000000.to_bytes(3, 'big')
         self.assertEqual(enc, proper_value)
+
+        coder = BitsCoder(
+            [
+                Int(6, name='temperature', value=21),
+                Bool(1, name='is_nice', value=True),
+                Float(18, 3, name='lat', value=78.234),
+                Float(18, 3, name='lon', value=-33.111)
+            ]
+        )
+        enc = coder.encode()
+        proper_value = 0b010101_1_010011000110011010_110111111010101001_00000
+        self.assertEqual(enc, proper_value.to_bytes(6, 'big'))
 
     def test_decoder(self):
         proper_map = {'a': -12, 'b': 2.11, 'c': True, 'd': 12, '___1': 0}
