@@ -21,9 +21,9 @@ Let's say we want to endode a following message:
 
     data = {
         'temperature': 21,
-		 'is_nice': True,
-		 'lat': 78.234,
-		 'lon': -33.111
+        'is_nice': True,
+        'lat': 78.234,
+        'lon': -33.111
     }
     
 And we want to use a following format:
