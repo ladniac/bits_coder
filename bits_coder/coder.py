@@ -150,3 +150,4 @@ class BitsCoder:
                 (2 ** field.nbits - 1)
             )
             field.decode(value)
+        self._create_fields_map()
