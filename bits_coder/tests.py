@@ -1,7 +1,8 @@
 import unittest
+from datetime import datetime
 
 from coder import BitsCoder
-from fields import Int, Uint, Float, Ufloat, Bool, Unicode
+from fields import Int, Uint, Float, Ufloat, Bool, Unicode, DateTime
 
 
 class TestFileds(unittest.TestCase):
@@ -61,6 +62,20 @@ class TestFileds(unittest.TestCase):
         field = Unicode(256 * 14, value=value)
         self.assertEqual(
             value,
+            field.decode(field.enc_value),
+        )
+
+    def test_datetime_field(self):
+        value = datetime.utcnow()
+        field = DateTime(8**4, precision=10**-6, value=value)
+        self.assertEqual(
+            value,
+            field.decode(field.enc_value),
+        )
+
+        field = DateTime(8**2, precision=1, value=value)
+        self.assertEqual(
+            value.replace(microsecond=0),
             field.decode(field.enc_value),
         )
 

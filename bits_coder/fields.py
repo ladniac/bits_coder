@@ -1,3 +1,6 @@
+from datetime import datetime
+
+
 bit_overfl_exc_txt = '{0} cannot fit in {1} bits'
 NBITS_AUTO = float('inf')
 
@@ -408,3 +411,42 @@ class Unicode(Field):
             pass
         self._value = value.decode(self.encoding)
         return self._value
+
+
+class DateTime(Field):
+    """Datetime field
+
+    Encodes datetime to bits
+
+    Parameters
+    ----------
+    nbits: int
+        Bits limit.
+        When used in encoder value will be representeb by `nbits` bits.
+    precision: float
+        Value precision in seconds.
+        Use floating point to use values smaller than 1.
+    name: str
+        (optional) Filed name.
+    value: datetime
+        (optional) Value which will be transformed to bits.
+
+    """
+    def __init__(self, nbits, precision, name=None, value=None):
+        self.precision = precision
+        super().__init__(nbits, name, value)
+
+    def encode(self):
+        val = self.value
+        enc_value = int(val.timestamp() / self.precision)
+        self.check_capacity(enc_value, self.nbits, self.value)
+        self.enc_value = enc_value
+
+    def decode(self, value):
+        self._value = datetime.fromtimestamp(value * self.precision)
+        return self._value
+
+    @classmethod
+    def check_capacity(cls, enc_value, nbits, value):
+        if enc_value > 2 ** nbits - 1:
+            raise OverflowError(bit_overfl_exc_txt.format(value, nbits))
