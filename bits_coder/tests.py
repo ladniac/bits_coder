@@ -59,21 +59,31 @@ class TestFileds(unittest.TestCase):
 
     def test_unicode_field(self):
         value = 'ćwie®ć'
-        field = Unicode(256 * 14, value=value)
+        field = Unicode(256 * 12, value=value)
+        self.assertEqual(len(field.enc_value), 12)
         self.assertEqual(
             value,
             field.decode(field.enc_value),
         )
+
+        field = Unicode(256 * 16, value=value)
+        self.assertEqual(len(field.enc_value), 16)
+        self.assertEqual(field.enc_value[:4].hex(), '00000000')
+
+        field = Unicode(
+            256 * 16, value=value, fill_type='suffix', fill_char='\2')
+        self.assertEqual(len(field.enc_value), 16)
+        self.assertEqual(field.enc_value[12:].hex(), '02020202')
 
     def test_datetime_field(self):
         value = datetime.utcnow()
-        field = DateTime(8**4, precision=10**-6, value=value)
+        field = DateTime(8 ** 4, precision=10 ** -6, value=value)
         self.assertEqual(
             value,
             field.decode(field.enc_value),
         )
 
-        field = DateTime(8**2, precision=1, value=value)
+        field = DateTime(8 ** 2, precision=1, value=value)
         self.assertEqual(
             value.replace(microsecond=0),
             field.decode(field.enc_value),

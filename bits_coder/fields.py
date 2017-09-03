@@ -349,6 +349,8 @@ class Unicode(Field):
         self.fill_type = fill_type
         self.fill_char = fill_char
         self.encoding = encoding
+        if encoding.lower() == 'utf-16':
+            self.encoding += '-be'
         super().__init__(nbits, name, value)
 
     @classmethod
@@ -369,9 +371,9 @@ class Unicode(Field):
             raise ValueError('Encoding {encoding} is not supported')
 
     def _fill_gap(self, value):
-        if (self.nbits / 8 - len(value)) > 0:
+        if (self.nbits / 256 - len(value)) > 0:
             fill = bytearray(
-                self.fill_char * int(self.nbits / 8 - len(value)),
+                self.fill_char * int(self.nbits / 256 - len(value)),
                 'utf8'
             )
             if self.fill_type == 'prefix':
